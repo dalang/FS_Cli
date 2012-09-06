@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/LinearLayout01"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/LinearLayout02"
+        android:layout_width="fill_parent"
+        android:layout_height="412dp"
+        android:layout_weight="1.77"
+        android:orientation="horizontal" >
+
+        <ScrollView
+            android:id="@+id/ScrollView01"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:scrollbarAlwaysDrawVerticalTrack="true" >
+
+            <EditText
+                android:id="@+id/termOutput"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:background="@color/out_back_color"
+                android:editable="false"
+                android:imeOptions="actionSend|flagNoEnterAction"
+                android:text=""
+                android:textColor="@color/out_text_color"
+                android:textSize="@dimen/out_text_size"
+                android:typeface="monospace" />
+        </ScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/LinearLayout03"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/Input"
+            android:layout_width="fill_parent"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:layout_gravity="left"
+            android:background="@color/gainsboro"
+            android:imeOptions="actionSend|flagNoEnterAction"
+            android:text="@string/Prompt"
+            android:hint="@string/Hint"
+            android:textColor="@color/black"
+            android:textSize="@dimen/in_text_size" >
+        </EditText>
+
+        <Button
+            android:id="@+id/enter"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_gravity="right"
+            android:background="#0000ca"
+            android:clickable="true"
+            android:text="@string/Enter_key"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+
+</LinearLayout>

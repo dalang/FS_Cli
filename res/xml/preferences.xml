@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2008 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/fs_preferences">
+
+    <EditTextPreference
+            android:key="server"
+            android:defaultValue="@string/default_value_server_fs_preference"
+            android:title="@string/title_server_fs_preference"
+            android:summary="@string/summary_server_fs_preference"
+            android:dialogTitle="@string/dialog_title_server_fs_preference" />
+    <EditTextPreference
+            android:key="password"
+            android:defaultValue="@string/default_value_password_fs_preference"
+            android:title="@string/title_password_fs_preference"
+            android:summary="@string/summary_password_fs_preference"
+            android:dialogTitle="@string/dialog_title_password_fs_preference" />
+    <EditTextPreference
+            android:key="port"
+            android:defaultValue="@string/default_value_port_fs_preference"
+            android:title="@string/title_port_fs_preference"
+            android:summary="@string/summary_port_fs_preference"
+            android:dialogTitle="@string/dialog_title_port_fs_preference" />
+
+    </PreferenceCategory>
+</PreferenceScreen>
