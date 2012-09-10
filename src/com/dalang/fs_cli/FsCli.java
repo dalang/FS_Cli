@@ -1,5 +1,6 @@
 package com.dalang.fs_cli;
 
+import android.text.Html;
 import java.util.ArrayList;
 
 import com.dalang.fs_cli.EventSocketManager;
@@ -81,7 +82,12 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
 	
     public Handler handle = new Handler(){
     	public void handleMessage(Message msg){
-    		termOut.append((String)msg.obj);
+    		if (msg.what == 1){
+        		termOut.append(Html.fromHtml("<font color='yellow'>" + (String)msg.obj + "</font>"));
+        		termOut.append("\n");
+    		} else {
+    			termOut.append((String)msg.obj);
+    		}
     		scrollDown();
     		prompt_box.requestFocusFromTouch();
     	}
@@ -235,16 +241,23 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
         
         prompt_box.setOnKeyListener(new OnKeyListener(){
         	public boolean onKey(View v, int keyCode, KeyEvent event) { 
-		        if(keyCode == KeyEvent.KEYCODE_DEL) { 
+		        if (keyCode == KeyEvent.KEYCODE_DEL) { 
 		    		if(prompt_box.getText().length() <= 2 || prompt_box.getSelectionStart() <= 2)
 		    			return true;
 		        }
 		        
-		        if(keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+		        if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
 		        	if(prompt_box.getSelectionStart() <= 2)
 		        		return true;
-		        }
-		        
+				}
+				if (keyCode == KeyEvent.KEYCODE_ENTER) {
+					if (event.getAction() == KeyEvent.ACTION_DOWN) {
+						enter_pressed();
+						return true;
+					} else {
+						return false;
+					}
+				}
 		        return false;
 		    } 
 		});
@@ -274,14 +287,10 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
 	    	case KeyEvent.KEYCODE_DPAD_UP:
 	    		retriveHistory(true);
 	    		prompt_box.setSelected(true);
-	    		termOut.setSelected(false);
-	
+	    		termOut.setSelected(false);	
 	    		return true;
 	    	case KeyEvent.KEYCODE_DPAD_CENTER:
 	    		prompt_box.setText("DPAD_CENTER");
-	    		return true;
-	    	case 66:
-	    		prompt_box.setText("66");
 	    		return true;
     	}
     	//return true;

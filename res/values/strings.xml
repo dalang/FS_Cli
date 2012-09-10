@@ -9,7 +9,7 @@
 	<color name="out_back_color">#000000</color>
 	<dimen name="out_text_size">10sp</dimen>	
 	<dimen name="CommandOptionsTab">100px</dimen>
-	<dimen name="in_text_size">30sp</dimen>
+	<dimen name="in_text_size">20sp</dimen>
 	<string name="action_prompt">action:</string>
 	
    <string name="close_window">Close window</string>

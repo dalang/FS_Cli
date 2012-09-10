@@ -176,7 +176,8 @@ public class EventSocketManager {
     			out += content + "\n";
     		}
     		//out = response.getBodyLines().get(3);
-    		parent.handle.sendMessage(Message.obtain(parent.handle,0,out));
+    		//out = Html.fromHtml("<font color='yellow'>" + out + "</font>");  
+    		parent.handle.sendMessage(Message.obtain(parent.handle,1,out));
     	}
     	return ;
     }
