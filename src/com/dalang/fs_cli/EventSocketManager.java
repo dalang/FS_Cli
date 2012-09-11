@@ -102,8 +102,9 @@ public class EventSocketManager {
 	            {
 	                log.info( "Event received [{}]", event );
 	                StringBuilder sb=new StringBuilder();
-	                for (Object o:event.getEventHeaders().keySet()){    
-	                    sb.append(o.toString() + ": " + event.getEventHeaders().get(o) + "<br/>");	                    
+	                for (Object o:event.getEventHeaders().keySet()){
+	                	if ((o.toString()).length() > 0)
+	                		sb.append(o.toString() + ": " + event.getEventHeaders().get(o) + "<br/>");	                    
 	                }	                
 	                parent.handle.sendMessage(Message.obtain(parent.handle, 1, sb.toString()));
 	            }
