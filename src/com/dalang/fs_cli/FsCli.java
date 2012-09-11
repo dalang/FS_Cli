@@ -73,6 +73,19 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
 			"\n",
 			"Type /help <enter> to see a list of commands\n\n\n"};
 	
+	static String []cli_usage = {
+			"Command                    \tDescription\n",
+			"-----------------------------------------------\n",
+			"/help                      \tHelp\n",
+			"/exit, /quit, /bye, ...    \tExit the program.\n",
+			"/event, /noevents, /nixevent\tEvent commands.\n",
+			//"/log, /nolog               \tLog commands.\n",
+			//"/uuid                      \tFilter logs for a single call uuid\n",
+			//"/filter                    \tFilter commands.\n",
+			//"/debug [0-7]               \tSet debug level.\n",
+			"\n"};
+
+
 	public void print_banner()
 	{
 		for (String strline : banner) {
@@ -82,12 +95,21 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
 	
     public Handler handle = new Handler(){
     	public void handleMessage(Message msg){
-    		if (msg.what == 1){
+    		switch(msg.what) {
+    		case 0:
+    			termOut.append((String)msg.obj);
+    			break;
+    		case 1:
         		termOut.append(Html.fromHtml("<font color='yellow'>" + (String)msg.obj + "</font>"));
         		termOut.append("\n");
-    		} else {
-    			termOut.append((String)msg.obj);
-    		}
+        		break;
+    		case 2:
+        		termOut.append(Html.fromHtml("<font color='fuchsia'>" + (String)msg.obj + "</font>"));
+        		termOut.append("\n");
+    			break;
+			default:
+				
+        	}
     		scrollDown();
     		prompt_box.requestFocusFromTouch();
     	}
@@ -106,6 +128,7 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
         if (id == R.id.menu_preferences) {
             doPreferences();
         } else if (id == R.id.menu_close_window) {
+        	evtsock.exit();
             doCloseWindow();
         } else if (id == R.id.menu_reset) {
             doResetFsCli();
@@ -299,16 +322,61 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
     
     public void enter_pressed(){
 		String cmd = prompt_box.getText().toString();
-		//Spannable s = prompt_box.getText();
-		//s.setSpan(new StyleSpan(android.graphics.Typeface.ITALIC), 0, s.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		
+		int promptlen = getResources().getString(R.string.Prompt).length();
 		termOut.append(cmd+"\n");
-		if(cmd.length() > 2 )
+		if (cmd.length() > promptlen)
 		{
-			addHistory(cmd.substring(2));
-			//term.exec(cmd+"\n");
-			if(null != evtsock)
-				evtsock.SendApiCommand(cmd.substring(2));
+			addHistory(cmd.substring(promptlen));
+			if(cmd.charAt(promptlen) == '/') {
+				String []strArr = cmd.substring(promptlen + 1).split(" ");
+				if (strArr[0].equals("help")) {
+					for (String strline : cli_usage) {
+						handle.sendMessage(Message.obtain(this.handle,0,strline));
+					}
+				} else if (strArr[0].equals("exit")||strArr[0].equals("quit")||strArr[0].equals("bye")) {
+					evtsock.exit();
+		            doCloseWindow();
+				} else if (strArr[0].equals("event")) {
+					String fmt;
+					StringBuilder evt;
+					fmt = "plain";
+					evt = new StringBuilder();
+					for(int i = 1; i < strArr.length; i++) {
+						if (i == 1) {
+							if (strArr[i].equals("plain") || strArr[i].equals("xml")) {
+								fmt = strArr[i];
+								continue;
+							}
+						}
+						evt.append(strArr[i] + " ");
+					}
+					evtsock.sub_event(fmt, evt.toString());
+				} else if (strArr[0].equals("noevents")) {
+					evtsock.no_events();
+				} else if (strArr[0].equals("nixevent")) {
+					
+				} else if (strArr[0].equals("log")) {
+					String loglevel = new String("");
+					if (strArr.length > 1)
+						loglevel = strArr[1];
+					evtsock.log(loglevel);
+				} else if (strArr[0].equals("nolog")) {
+					evtsock.no_log();
+				} else if (strArr[0].equals("uuid")) {
+					
+				} else if (strArr[0].equals("filter")) {
+					
+				} else if (strArr[0].equals("debug")) {
+					
+				} else {
+					
+				}
+			} else {
+				if (cmd.substring(promptlen, promptlen + 5).equals("bgapi"))
+					evtsock.send_bgapicmd(cmd.substring(promptlen + 5));
+				else
+					evtsock.send_apicmd(cmd.substring(promptlen));
+			}
 		}
 		
 		scrollDown();
@@ -327,12 +395,12 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
     	if(up){
     		if(localHistoryIndex > 0){
     			localHistoryIndex--;
-    			prompt_box.setText(">_"+localHistory.get(localHistoryIndex));
+    			prompt_box.setText(getResources().getString(R.string.Prompt)+localHistory.get(localHistoryIndex));
     			prompt_box.setSelection(prompt_box.getText().length());
     		}
     	}else{
     		if(localHistoryIndex < localHistory.size()){    			
-    			prompt_box.setText(">_"+localHistory.get(localHistoryIndex));
+    			prompt_box.setText(getResources().getString(R.string.Prompt)+localHistory.get(localHistoryIndex));
     			prompt_box.setSelection(prompt_box.getText().length());
     			localHistoryIndex++;
     		}    		

@@ -61,6 +61,31 @@ public class EslHeaders
          * {@code "Control"}
          */
         Control( "Control" ),
+        // Added by dalang
+        /**
+         * {@code "Log-Level"}
+         */
+        LOG_LEVEL( "Log-Level" ),
+        /**
+         * {@code "Text-Channel"}
+         */
+        TEXT_CHANNEL( "Text-Channel" ),
+        /**
+         * {@code "Log-File"}
+         */
+        LOG_FILE( "Log-File" ),
+        /**
+         * {@code "Log-Func"}
+         */
+        LOG_FUNC( "Log-Func" ),
+        /**
+         * {@code "Log-Line"}
+         */
+        LOG_LINE( "Log-Line" ),
+        /**
+         * {@code "User-Data"}
+         */
+        USER_DATA( "User-Data" ),
         ;
         
         private final String literal;
@@ -131,6 +156,10 @@ public class EslHeaders
          * {@code "-ERR invalid"}
          */
         public static final String ERR_INVALID = "-ERR invalid";
+        /** added by dalang
+         * {@code "log/data"}
+         */
+        public static final String LOG_DATA = "log/data";        
     }
     
 }

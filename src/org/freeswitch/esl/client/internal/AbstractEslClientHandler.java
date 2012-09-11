@@ -69,6 +69,7 @@ public abstract class AbstractEslClientHandler extends SimpleChannelUpstreamHand
     @Override
     public void messageReceived( ChannelHandlerContext ctx, MessageEvent e ) throws Exception
     {
+        log.info( "content-type: [{}]", e.getMessage().getClass() );
         if ( e.getMessage() instanceof EslMessage )
         {
             EslMessage message = (EslMessage)e.getMessage();
@@ -77,6 +78,13 @@ public abstract class AbstractEslClientHandler extends SimpleChannelUpstreamHand
                     contentType.equals( Value.TEXT_EVENT_XML ) )
             {
                 //  transform into an event
+                EslEvent eslEvent = new EslEvent( message );
+                handleEslEvent( ctx, eslEvent );
+            }
+        	else if ( contentType.equals( Value.LOG_DATA ) )
+        	{
+                //  transform into an event
+        		log.info( "content-type1: [{}]", e.getMessage().getClass() );
                 EslEvent eslEvent = new EslEvent( message );
                 handleEslEvent( ctx, eslEvent );
             }
@@ -202,6 +210,11 @@ public abstract class AbstractEslClientHandler extends SimpleChannelUpstreamHand
         {
             log.debug( "Disconnect notice received [{}]", message );
             handleDisconnectionNotice();
+        }
+        else if ( contentType.equals( Value.LOG_DATA ) )
+        {
+            log.debug( "Log data received [{}]", message );
+            syncCallbacks.poll().handle( message );
         }
         else
         {

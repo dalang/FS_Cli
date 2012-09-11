@@ -76,6 +76,10 @@ public class EslEvent
         {
             throw new IllegalStateException( "XML events are not yet supported" );
         }
+        else if ( rawMessage.getContentType().equals( Value.LOG_DATA ) )
+        {
+        	parsePlainBody( rawMessage.getBodyLines() );
+        }
         else if ( rawMessage.getContentType().equals( Value.COMMAND_REPLY ) && parseCommandReply )
         {
             parsePlainBody( rawMessage.getBodyLines() );

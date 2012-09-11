@@ -8,6 +8,7 @@ import java.util.Iterator;
 import org.freeswitch.esl.client.IEslEventListener;
 import org.freeswitch.esl.client.inbound.Client;
 import org.freeswitch.esl.client.inbound.InboundConnectionFailure;
+import org.freeswitch.esl.client.transport.CommandResponse;
 import org.freeswitch.esl.client.transport.event.EslEvent;
 import org.freeswitch.esl.client.transport.message.EslMessage;
 import org.freeswitch.esl.client.transport.message.EslHeaders.Name;
@@ -15,7 +16,6 @@ import org.freeswitch.esl.client.transport.message.EslHeaders.Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dalang.fs_cli.R;
 
 public class EventSocketManager {
 	FsCli parent;
@@ -101,11 +101,20 @@ public class EventSocketManager {
 	            public void eventReceived( EslEvent event )
 	            {
 	                log.info( "Event received [{}]", event );
-	                parent.handle.sendMessage(Message.obtain(parent.handle, 0, event.toString()));
+	                StringBuilder sb=new StringBuilder();
+	                for (Object o:event.getEventHeaders().keySet()){    
+	                    sb.append(o.toString() + ": " + event.getEventHeaders().get(o) + "<br/>");	                    
+	                }	                
+	                parent.handle.sendMessage(Message.obtain(parent.handle, 1, sb.toString()));
 	            }
 	            public void backgroundJobResultReceived( EslEvent event )
 	            {
 	                log.info( "Background job result received [{}]", event );
+	                StringBuilder sb=new StringBuilder();
+	                for (Object o:event.getEventHeaders().keySet()){    
+	                    sb.append(o.toString() + ": " + event.getEventHeaders().get(o) + "<br/>");	                    
+	                }
+	                parent.handle.sendMessage(Message.obtain(parent.handle, 2, sb.toString()));
 	            }
 	
 	        } ); 
@@ -116,8 +125,7 @@ public class EventSocketManager {
     		log.info( "Client conn" +
     				"{ecting .." );
     		try
-    		{
-    			
+    		{   			
     				client.connect( host, port, password, 2 );
     		}
     		catch ( InboundConnectionFailure e )
@@ -160,8 +168,73 @@ public class EventSocketManager {
          */
         
     }
-    
-    public void SendApiCommand(String cmd)
+    public void exit()
+    {
+		CommandResponse cresponse;
+		String out = "";
+
+		if (client.canSend()) {
+			cresponse = client.close();
+			for (Iterator<String> i = cresponse.getResponse().getBodyLines()
+					.iterator(); i.hasNext();) {
+				String content = i.next();
+				out += content + "\n";
+			}
+			out +=  "Goodbye!\nSee you at ClueCon http://www.cluecon.com/\n";
+			parent.handle.sendMessage(Message.obtain(parent.handle, 0, out));
+		}
+
+		return;
+    }
+    public void sub_event(String format, String events)
+    {
+    	CommandResponse cresponse;
+    	String out = "";
+		
+		if (client.canSend()) {
+				cresponse = client.setEventSubscriptions(format, events);
+	    		out += cresponse.getReplyText() + "\n";
+	    		parent.handle.sendMessage(Message.obtain(parent.handle,0,out));			
+		}
+		return;
+    }
+    public void no_events()
+    {
+    	CommandResponse cresponse;
+    	String out = "";
+
+    	if (client.canSend()) {
+        	cresponse = client.cancelEventSubscriptions();
+    		out += cresponse.getReplyText() + "\n";
+    		parent.handle.sendMessage(Message.obtain(parent.handle,0,out));
+    	}
+    	return;
+    }
+    public void log(String loglevel)
+    {
+    	CommandResponse cresponse;
+    	String out = "";
+
+    	if (client.canSend()) {
+        	cresponse = client.setLoggingLevel(loglevel);
+    		out += cresponse.getReplyText() + "\n";
+    		parent.handle.sendMessage(Message.obtain(parent.handle,0,out));
+    	}
+    	return;  	
+    }
+    public void no_log()
+    {
+    	CommandResponse cresponse;
+    	String out = "";
+
+    	if (client.canSend()) {
+        	cresponse = client.cancelLogging();
+        	out += cresponse.getReplyText() + "\n";
+    		parent.handle.sendMessage(Message.obtain(parent.handle,0,out));
+    	}
+    	return;  	
+    }
+    public void send_apicmd(String cmd)
     {
     	EslMessage response;
     	String out = "";
@@ -174,12 +247,14 @@ public class EventSocketManager {
     		{
     			String content = i.next();
     			out += content + "\n";
-    		}
-    		//out = response.getBodyLines().get(3);
-    		//out = Html.fromHtml("<font color='yellow'>" + out + "</font>");  
-    		parent.handle.sendMessage(Message.obtain(parent.handle,1,out));
+    		} 
+    		parent.handle.sendMessage(Message.obtain(parent.handle,0,out));
     	}
     	return ;
     }
-
+    public void send_bgapicmd(String cmd)
+    {
+        String jobId = client.sendAsyncApiCommand( cmd, "" );
+        log.info( "Job id [{}] for [{}]", jobId, cmd );    	
+    }
 }
