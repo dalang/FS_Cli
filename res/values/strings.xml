@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, FS_Cli on Android!</string>
-    <string name="app_name">FS_Cli on Android</string>
+    <string name="app_name">FS_Cli on Android v1.0</string>
 	<string name="Enter_key">Enter</string>
 	<string name="Prompt">>_</string>
 	<string name="Hint">Command Here</string>	
