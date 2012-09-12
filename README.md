@@ -1,7 +1,7 @@
 FS_Cli
 ======
 
-This is an terminal working with FreeSWITCH's event socket connection. An optional fs_cli on Android
+This is an terminal working with FreeSWITCH's event socket connection. An optional fs_cli on Android<br/>
 Press menu to set event socket 
 
 Version 1.0
