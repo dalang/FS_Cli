@@ -49,4 +49,11 @@ public interface IEslEventListener
      * @param event as an {@link EslEvent}
      */
     void backgroundJobResultReceived( EslEvent event );
+
+    /**
+     * Signal of an event containing log
+     * 
+     * @param event as an {@link EslEvent}
+     */
+    void logReceived( EslEvent event );
 }

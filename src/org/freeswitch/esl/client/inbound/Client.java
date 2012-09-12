@@ -72,7 +72,16 @@ public class Client
                 return new Thread( r, "EslBackgroundJobNotifier-" + threadNumber.getAndIncrement() );
             }
         });
-    
+    // Added by dalang
+    private final Executor logListenerExecutor = Executors.newSingleThreadExecutor( 
+            new ThreadFactory()
+            {
+                AtomicInteger threadNumber = new AtomicInteger( 1 );
+                public Thread newThread( Runnable r )
+                {
+                    return new Thread( r, "EslLogNotifier-" + threadNumber.getAndIncrement() );
+                }
+            });
     private AtomicBoolean authenticatorResponded = new AtomicBoolean( false );
     private boolean authenticated;
     private CommandResponse authenticationResponse;
@@ -421,57 +430,80 @@ public class Client
             authenticationResponse = response;
             log.debug( "Auth response success={}, message=[{}]", authenticated, response.getReplyText() );
         }
-        
+        public void messageReceived ( final EslEvent event )
+        {
+        	if ( null != event.getEventName() ) {
+        		eventReceived(event);
+        	}
+        	else
+        	{
+        		logReceived(event);
+        	}
+        }
+        private void logReceived( final EslEvent event)
+        {
+            log.debug( "Log received [{}]", event );
+            for ( final IEslEventListener listener : eventListeners )
+            {
+                logListenerExecutor.execute( new Runnable()
+                {
+                    public void run()
+                    {
+                        try
+                        {
+                            listener.logReceived( event );
+                        }
+                        catch ( Throwable t )
+                        {
+                            log.error( "Error caught notifying listener of log [" + event + ']', t );
+                        }
+                    }
+                } );
+            }
+        }
         public void eventReceived( final EslEvent event )
         {
-            log.debug( "Event received [{}]", event );
-            /*
-             *  Notify listeners in a different thread in order to:
-             *    - not to block the IO threads with potentially long-running listeners
-             *    - generally be defensive running other people's code
-             *  Use a different worker thread pool for async job results than for event driven
-             *  events to keep the latency as low as possible.
-             */
-            if ( event.getEventName().equals( "BACKGROUND_JOB" ) )
-            {
-                for ( final IEslEventListener listener : eventListeners )
-                {
-                    backgroundJobListenerExecutor.execute( new Runnable()
-                    {
-                        public void run()
-                        {
-                            try
-                            {
-                                listener.backgroundJobResultReceived( event );
-                            }
-                            catch ( Throwable t )
-                            {
-                                log.error( "Error caught notifying listener of job result [" + event + ']', t );
-                            }
-                        }
-                    } );
-                }
-            }
-            else
-            {
-                for ( final IEslEventListener listener : eventListeners )
-                {
-                    eventListenerExecutor.execute( new Runnable()
-                    {
-                        public void run()
-                        {
-                            try
-                            {
-                                listener.eventReceived( event );
-                            }
-                            catch ( Throwable t )
-                            {
-                                log.error( "Error caught notifying listener of event [" + event + ']', t );
-                            }
-                        }
-                    } );
-                }
-            }
+			if (null == event.getEventName()) {
+				logReceived(event);
+			} else {
+				log.debug("Event received [{}]", event);
+				/*
+				 * Notify listeners in a different thread in order to: - not to
+				 * block the IO threads with potentially long-running listeners
+				 * - generally be defensive running other people's code Use a
+				 * different worker thread pool for async job results than for
+				 * event driven events to keep the latency as low as possible.
+				 */
+				if (event.getEventName().equals("BACKGROUND_JOB")) {
+					for (final IEslEventListener listener : eventListeners) {
+						backgroundJobListenerExecutor.execute(new Runnable() {
+							public void run() {
+								try {
+									listener.backgroundJobResultReceived(event);
+								} catch (Throwable t) {
+									log.error(
+											"Error caught notifying listener of job result ["
+													+ event + ']', t);
+								}
+							}
+						});
+					}
+				} else {
+					for (final IEslEventListener listener : eventListeners) {
+						eventListenerExecutor.execute(new Runnable() {
+							public void run() {
+								try {
+									listener.eventReceived(event);
+								} catch (Throwable t) {
+									log.error(
+											"Error caught notifying listener of event ["
+													+ event + ']', t);
+								}
+							}
+						});
+					}
+				}
+			}
         }
 
         public void disconnected()

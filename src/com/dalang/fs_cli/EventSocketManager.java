@@ -112,12 +112,22 @@ public class EventSocketManager {
 	            {
 	                log.info( "Background job result received [{}]", event );
 	                StringBuilder sb=new StringBuilder();
-	                for (Object o:event.getEventHeaders().keySet()){    
+	                for (Object o:event.getEventHeaders().keySet()){
+	                	if ((o.toString()).length() > 0)
 	                    sb.append(o.toString() + ": " + event.getEventHeaders().get(o) + "<br/>");	                    
 	                }
 	                parent.handle.sendMessage(Message.obtain(parent.handle, 2, sb.toString()));
 	            }
-	
+	            public void logReceived( EslEvent event )
+	            {
+	                log.info( "Log result received [{}]", event );
+	                StringBuilder sb=new StringBuilder();
+	                for (Object o:event.getEventHeaders().keySet()){
+	                	if ((o.toString()).length() > 0)
+	                    sb.append(o.toString() + ": " + event.getEventHeaders().get(o) + "<br/>");	                    
+	                }
+	                parent.handle.sendMessage(Message.obtain(parent.handle, 3, sb.toString()));
+	            }	
 	        } ); 
     	}
     	

@@ -68,7 +68,7 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
 			"* FreeSWITCH (http://www.freeswitch.org)            *\n",
 			"* Brought to you by ClueCon http://www.cluecon.com/ *\n",
 			"*****************************************************\n",
-			"* Dalang @ CRSCY                                    *\n",
+			"* Dalang @ https://github.com/dalang/FS_Cli         *\n",
 			"*****************************************************\n",
 			"\n",
 			"Type /help <enter> to see a list of commands\n\n\n"};
@@ -78,8 +78,9 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
 			"-----------------------------------------------\n",
 			"/help                      \tHelp\n",
 			"/exit, /quit, /bye, ...    \tExit the program.\n",
-			"/event, /noevents, /nixevent\tEvent commands.\n",
-			//"/log, /nolog               \tLog commands.\n",
+			"/event, /noevents          \tEvent commands.\n",
+			//"/event, /noevents, /nixevent\tEvent commands.\n",
+			"/log, /nolog               \tLog commands.\n",
 			//"/uuid                      \tFilter logs for a single call uuid\n",
 			//"/filter                    \tFilter commands.\n",
 			//"/debug [0-7]               \tSet debug level.\n",
@@ -100,12 +101,45 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
     			termOut.append((String)msg.obj);
     			break;
     		case 1:
-        		termOut.append(Html.fromHtml("<font color='yellow'>" + (String)msg.obj + "</font>"));
-        		termOut.append("\n");
+        		termOut.append(Html.fromHtml("<font color='Aqua'>" + (String)msg.obj + "</font><br/>"));
         		break;
     		case 2:
-        		termOut.append(Html.fromHtml("<font color='fuchsia'>" + (String)msg.obj + "</font>"));
-        		termOut.append("\n");
+        		termOut.append(Html.fromHtml("<font color='fuchsia'>" + (String)msg.obj + "</font><br/>"));
+    			break;
+    		case 3:
+    			String []strArr = ((String)msg.obj).split("\n");
+    			for (String strline : strArr) {
+    				if (strline.matches("(.*)\\[ALER](.*)"))
+    				{
+    					termOut.append(Html.fromHtml("<font color='Red'>" + strline + "</font><br/>"));
+    				}
+    				else if (strline.matches("(.*)\\[CRIT](.*)"))
+    				{
+    					termOut.append(Html.fromHtml("<font color='Red'>" + strline + "</font><br/>")); 					
+    				}
+    				else if (strline.matches("(.*)\\[ERROR](.*)"))
+    				{
+    					termOut.append(Html.fromHtml("<font color='Red'>" + strline + "</font><br/>"));
+    				}
+    				else if (strline.matches("(.*)\\[WARNING](.*)"))
+    				{
+    					// violet
+    					termOut.append(Html.fromHtml("<font color='#EE82EE'>" + strline + "</font><br/>"));
+    				}
+    				else if (strline.matches("(.*)\\[NOTICE](.*)"))
+    				{
+    					// orange
+    					termOut.append(Html.fromHtml("<font color='#FFA500'>" + strline + "</font><br/>"));
+    				}
+    				else if (strline.matches("(.*)\\[INFO](.*)"))
+    				{
+    					termOut.append(Html.fromHtml("<font color='green'>" + strline + "</font>"));
+    				}
+    				else if (strline.matches("(.*)\\[DEBUG](.*)"))
+    				{   		            
+    					termOut.append(Html.fromHtml("<font color='yellow'>" + strline + "</font>"));    					
+    				}
+    			}
     			break;
 			default:
 				
@@ -128,7 +162,6 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
         if (id == R.id.menu_preferences) {
             doPreferences();
         } else if (id == R.id.menu_close_window) {
-        	evtsock.exit();
             doCloseWindow();
         } else if (id == R.id.menu_reset) {
             doResetFsCli();
@@ -335,7 +368,6 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
 					}
 				} else if (strArr[0].equals("exit")||strArr[0].equals("quit")||strArr[0].equals("bye")) {
 					evtsock.exit();
-		            doCloseWindow();
 				} else if (strArr[0].equals("event")) {
 					String fmt;
 					StringBuilder evt;
@@ -356,7 +388,7 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
 				} else if (strArr[0].equals("nixevent")) {
 					
 				} else if (strArr[0].equals("log")) {
-					String loglevel = new String("");
+					String loglevel = new String("7");
 					if (strArr.length > 1)
 						loglevel = strArr[1];
 					evtsock.log(loglevel);
