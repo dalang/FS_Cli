@@ -6,19 +6,19 @@ Press menu to set event socket
 
 Version 1.0
 
-Development Enviroment:<br/>
+##Development Environment:<br/>
 eclipse indigo<br/>
 Android 2.3.3
 
-Acknowledge:<br/>
+##Acknowledge:<br/>
 Java ESL Client from dvarnes http://wiki.freeswitch.org/wiki/Java_ESL_Client<br/>
 The Shell is based on https://github.com/yussidivnall/Android-Terminal/tree/master/src/test/term2
 
-Implemented:<br/>
+##Implemented:<br/>
 /event /noevents for listening events from freeSWITCH<br/>
 /log /nolog for showing log data from freeSWITCH
 
-TODO:<br/>
+##TODO:<br/>
 /nixevent<br/>
 /filter
 
