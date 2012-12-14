@@ -32,8 +32,8 @@ public class EventSocketManager {
 		port = setting.getPort();
 	}
 	
-	public boolean changesetting(FsSetting setting) {
-		boolean status = false;
+	public void changesetting(FsSetting setting) {
+		final boolean[] status = {false};
 		host = setting.getServer();
 		password = setting.getPassword();
 		port = setting.getPort();
@@ -51,15 +51,19 @@ public class EventSocketManager {
 			Log.e("Sleep", "waiting for connection closed error");
 		}
 		
-		try{
-			status = do_connect();
-		}
-		catch (InterruptedException e)
-		{
-			Log.e("Connect failed", e.toString() );
-		}
-		
-		return status;
+		new Thread() {
+			@Override
+			public void run() {				
+				try{
+					status[0] = do_connect();
+				}
+				catch (InterruptedException e)
+				{
+					Log.e("Connect failed", e.toString() );
+				}
+				parent.onConnect(status[0]);
+			}
+		}.start();
 	}
 	
 	public boolean reset(FsSetting setting) {

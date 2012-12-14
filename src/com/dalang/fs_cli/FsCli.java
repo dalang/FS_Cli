@@ -141,6 +141,9 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
     				}
     			}
     			break;
+    		case 4:
+    			termOut.setText((String)msg.obj);
+    			break;
 			default:
 				
         	}
@@ -440,30 +443,33 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
     	//prompt_box.setText("Got me here!!!! motherfucker");
     }
     
+    
     public void startTest(FsSetting setting){
     	//boolean lastconnect = connected;
     	if(connected == false) {
     		evtsock = new EventSocketManager(this, setting);
-    		try{
-    			connected = evtsock.do_connect();
-    		}
-    		catch (InterruptedException e)
-    		{
-    			Log.e("Connect failed", e.toString() );
-    		}
-
-    		if(connected)
-    		{
-    			// switch screen mode wouldn't print banner
-    			//    		if(!lastconnect)
-    			print_banner();
-    		}
-    		else
-    			termOut.append("Error Connecting\n");
-
+			new Thread() {
+				@Override
+				public void run() {
+					try {
+						connected = evtsock.do_connect();
+					} catch (InterruptedException e) {
+						Log.e("Connect failed", e.toString());
+					}
+		    		if(connected)
+		    		{
+		    			print_banner();
+		    		}
+		    		else
+		    			print_error();
+				}
+			}.start();
     	}
     }
     
+    public void print_error() {
+		handle.sendMessage(Message.obtain(this.handle,0,"Error Connecting\n"));
+    }
     
     public void scrollDown(){
 		final ScrollView sv = (ScrollView)findViewById(R.id.ScrollView01);
@@ -478,14 +484,17 @@ public class FsCli extends Activity implements OnSharedPreferenceChangeListener 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
     	mSettings.readPrefs(mPrefs);
     	if(evtsock != null)
-    		connected = evtsock.changesetting(mSettings);
-
-    	termOut.setText("");
+    		evtsock.changesetting(mSettings);
+    } 
+    public void onConnect(boolean isConnected) {
+    	connected = isConnected;
+    	handle.sendMessage(Message.obtain(this.handle, 0, ""));
+//    	termOut.setText("");
 		if(connected)
 		{
 			print_banner();
 		}
 		else
-			termOut.append("Error Connecting\n");
-    } 
+			print_error();
+    }
 }
